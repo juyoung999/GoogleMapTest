@@ -2,6 +2,7 @@ package com.example.googlemaptest;
 
 import android.view.LayoutInflater;
 import android.widget.Button;
+
 import java.util.HashSet;
 import java.util.ArrayList;
 
@@ -57,12 +58,12 @@ import noman.googleplaces.PlacesListener;
 public class MainActivity extends AppCompatActivity
         implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback,
-        PlacesListener{
+        PlacesListener {
 
     private GoogleMap mMap;
     private Marker currentMarker = null;
 
-    private static final String TAG = "googlemap_example";
+    private static final String TAG = "googlemap";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int UPDATE_INTERVAL_MS = 1000;  // 1초
     private static final int FASTEST_UPDATE_INTERVAL_MS = 500; // 0.5초
@@ -74,21 +75,17 @@ public class MainActivity extends AppCompatActivity
 
 
     // 앱을 실행하기 위해 필요한 퍼미션을 정의합니다.
-    String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
-
+    String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
 
     Location mCurrentLocatiion;
     LatLng currentPosition;
-    int category; //선택한 카테고리 넘버
-
-
+    LatLng NEW_LOCATION;
 
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest locationRequest;
     private Location location;
-
-
     private View mLayout;  // Snackbar 사용하기 위해서는 View가 필요합니다.
+    int category; //선택한 카테고리 넘버
 
     @Override
     public void onPlacesFailure(PlacesException e) {
@@ -127,10 +124,8 @@ public class MainActivity extends AppCompatActivity
                 hashSet.addAll(previous_marker);
                 previous_marker.clear();
                 previous_marker.addAll(hashSet);
-
             }
         });
-
     }
 
     @Override
@@ -138,66 +133,75 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void showPlaceInformation(LatLng location)
-    {
+    public void showPlaceInformation(LatLng location) {
         mMap.clear();//지도 클리어
 
         if (previous_marker != null)
             previous_marker.clear();//지역정보 마커 클리어
 
-        switch(category){//카테고리별 검색
-            case 0: new NRPlaces.Builder()
-                    .listener(MainActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
-                    .latlng(location.latitude, location.longitude)//현재 위치
-                    .radius(500) //500 미터 내에서 검색
-                    .build()
-                    .execute();
+        NEW_LOCATION = new LatLng(37.581526, 127.048904); //현재위치말고 검색할 새위치
+
+
+        switch (category) {//카테고리별 검색
+            case 0:
+                setNewLocation();
+                new NRPlaces.Builder()
+                        .listener(MainActivity.this)
+                        .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                        .latlng(NEW_LOCATION.latitude, NEW_LOCATION.longitude)//현재 위치
+                        .radius(1000) //1000 미터 내에서 검색
+                        .build()
+                        .execute();
                 break;
-            case 1: new NRPlaces.Builder()
-                    .listener(MainActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
-                    .latlng(location.latitude, location.longitude)//현재 위치
-                    .radius(500) //500 미터 내에서 검색
-                    .type(PlaceType.RESTAURANT) //음식점
-                    .build()
-                    .execute();
+            case 1:
+                new NRPlaces.Builder()
+                        .listener(MainActivity.this)
+                        .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                        .latlng(location.latitude, location.longitude)//현재 위치
+                        .radius(500) //500 미터 내에서 검색
+                        .type(PlaceType.RESTAURANT) //음식점
+                        .build()
+                        .execute();
                 break;
-            case 2: new NRPlaces.Builder()
-                    .listener(MainActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
-                    .latlng(location.latitude, location.longitude)//현재 위치
-                    .radius(500) //500 미터 내에서 검색
-                    .type(PlaceType.CAFE) //카페
-                    .build()
-                    .execute();
+            case 2:
+                new NRPlaces.Builder()
+                        .listener(MainActivity.this)
+                        .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                        .latlng(location.latitude, location.longitude)//현재 위치
+                        .radius(500) //500 미터 내에서 검색
+                        .type(PlaceType.CAFE) //카페
+                        .build()
+                        .execute();
                 break;
-            case 3: new NRPlaces.Builder()
-                    .listener(MainActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
-                    .latlng(location.latitude, location.longitude)//현재 위치
-                    .radius(500) //500 미터 내에서 검색
-                    .type(PlaceType.BUS_STATION) //버스 정류장
-                    .build()
-                    .execute();
+            case 3:
+                new NRPlaces.Builder()
+                        .listener(MainActivity.this)
+                        .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                        .latlng(location.latitude, location.longitude)//현재 위치
+                        .radius(500) //500 미터 내에서 검색
+                        .type(PlaceType.BUS_STATION) //버스 정류장
+                        .build()
+                        .execute();
                 break;
-            case 4: new NRPlaces.Builder()
-                    .listener(MainActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
-                    .latlng(location.latitude, location.longitude)//현재 위치
-                    .radius(500) //500 미터 내에서 검색
-                    .type(PlaceType.BANK) //은행
-                    .build()
-                    .execute();
+            case 4:
+                new NRPlaces.Builder()
+                        .listener(MainActivity.this)
+                        .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                        .latlng(location.latitude, location.longitude)//현재 위치
+                        .radius(500) //500 미터 내에서 검색
+                        .type(PlaceType.BANK) //은행
+                        .build()
+                        .execute();
                 break;
-            case 5: new NRPlaces.Builder()
-                    .listener(MainActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
-                    .latlng(location.latitude, location.longitude)//현재 위치
-                    .radius(500) //500 미터 내에서 검색
-                    .type(PlaceType.PARK) //공원
-                    .build()
-                    .execute();
+            case 5:
+                new NRPlaces.Builder()
+                        .listener(MainActivity.this)
+                        .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                        .latlng(location.latitude, location.longitude)//현재 위치
+                        .radius(500) //500 미터 내에서 검색
+                        .type(PlaceType.PARK) //공원
+                        .build()
+                        .execute();
                 break;
         }
 
@@ -216,7 +220,7 @@ public class MainActivity extends AppCompatActivity
 
         previous_marker = new ArrayList<Marker>();
 
-        Button button = (Button)findViewById(R.id.button);
+        Button button = (Button) findViewById(R.id.button); //장소검색 버튼
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -224,7 +228,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        Button c_button = (Button)findViewById(R.id.c_button);
+        Button c_button = (Button) findViewById(R.id.c_button); //카테고리 선택 버튼
         c_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -245,9 +249,7 @@ public class MainActivity extends AppCompatActivity
 
         builder.addLocationRequest(locationRequest);
 
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -265,9 +267,9 @@ public class MainActivity extends AppCompatActivity
         ListItems.add("은행");
         ListItems.add("공원");
 
-        final CharSequence[] items =  ListItems.toArray(new String[ ListItems.size()]);
+        final CharSequence[] items = ListItems.toArray(new String[ListItems.size()]);
 
-        final List SelectedItems  = new ArrayList();
+        final List SelectedItems = new ArrayList();
         int defaultItem = 0;
         SelectedItems.add(defaultItem);
 
@@ -284,15 +286,15 @@ public class MainActivity extends AppCompatActivity
         builder.setPositiveButton("Ok",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        String msg="";
+                        String msg = "";
 
                         if (!SelectedItems.isEmpty()) {
                             int index = (int) SelectedItems.get(0);
                             msg = ListItems.get(index);
-                            category=index; /////////
+                            category = index; //카테고리 넘버 저장
                         }
                         Toast.makeText(getApplicationContext(),
-                                "Items Selected.\n"+ msg , Toast.LENGTH_LONG)
+                                 msg + " 선택 됨", Toast.LENGTH_LONG)
                                 .show();
                     }
                 });
@@ -312,47 +314,9 @@ public class MainActivity extends AppCompatActivity
 
         mMap = googleMap;
 
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener(){
-
-            @Override
-            public void onMapLongClick(final LatLng latLng) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                LayoutInflater inflater = getLayoutInflater();
-                View view = inflater.inflate(R.layout.dialog_place_info, null);
-                builder.setView(view);
-                final Button button_submit = (Button) view.findViewById(R.id.button_dialog_placeInfo);
-                final EditText editText_placeTitle = (EditText) view.findViewById(R.id.editText_dialog_placeTitle);
-                final EditText editText_placeDesc = (EditText) view.findViewById(R.id.editText_dialog_placeDesc);
-
-                final AlertDialog dialog = builder.create();
-                button_submit.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        String string_placeTitle = editText_placeTitle.getText().toString();
-                        String string_placeDesc = editText_placeDesc.getText().toString();
-                        Toast.makeText(MainActivity.this, string_placeTitle+"\n"+string_placeDesc,Toast.LENGTH_SHORT).show();
-
-
-                        //맵을 클릭시 현재 위치에 마커 추가
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.title(string_placeTitle);
-                        markerOptions.snippet(string_placeDesc);
-                        markerOptions.draggable(true);
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-
-                        if ( addedMarker != null ) mMap.clear();
-                        addedMarker = mMap.addMarker(markerOptions);
-
-                        dialog.dismiss();
-                    }
-                });
-
-
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
         //지도의 초기위치를 서울로 이동
         setDefaultLocation();
-
 
 
         //런타임 퍼미션 처리
@@ -363,9 +327,8 @@ public class MainActivity extends AppCompatActivity
                 Manifest.permission.ACCESS_COARSE_LOCATION);
 
 
-
         if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
-                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED   ) {
+                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
 
             // 2. 이미 퍼미션을 가지고 있다면
             // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식합니다.)
@@ -374,7 +337,7 @@ public class MainActivity extends AppCompatActivity
             startLocationUpdates(); // 3. 위치 업데이트 시작
 
 
-        }else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
+        } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
 
             // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
@@ -387,7 +350,7 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(View view) {
 
                         // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신됩니다.
-                        ActivityCompat.requestPermissions( MainActivity.this, REQUIRED_PERMISSIONS,
+                        ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
                                 PERMISSIONS_REQUEST_CODE);
                     }
                 }).show();
@@ -396,7 +359,7 @@ public class MainActivity extends AppCompatActivity
             } else {
                 // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
                 // 요청 결과는 onRequestPermissionResult에서 수신됩니다.
-                ActivityCompat.requestPermissions( this, REQUIRED_PERMISSIONS,
+                ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS,
                         PERMISSIONS_REQUEST_CODE);
             }
 
@@ -412,7 +375,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onMapClick(LatLng latLng) {
 
-                Log.d( TAG, "onMapClick :");
+                Log.d(TAG, "onMapClick :");
             }
         });
     }
@@ -444,20 +407,16 @@ public class MainActivity extends AppCompatActivity
 
                 mCurrentLocatiion = location;
             }
-
-
         }
-
     };
 
 
     private void startLocationUpdates() {
 
         if (!checkLocationServicesStatus()) {
-
             Log.d(TAG, "startLocationUpdates : call showDialogForLocationServiceSetting");
             showDialogForLocationServiceSetting();
-        }else {
+        } else {
 
             int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION);
@@ -465,9 +424,8 @@ public class MainActivity extends AppCompatActivity
                     Manifest.permission.ACCESS_COARSE_LOCATION);
 
 
-
             if (hasFineLocationPermission != PackageManager.PERMISSION_GRANTED ||
-                    hasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED   ) {
+                    hasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED) {
 
                 Log.d(TAG, "startLocationUpdates : 퍼미션 안가지고 있음");
                 return;
@@ -480,11 +438,8 @@ public class MainActivity extends AppCompatActivity
 
             if (checkPermission())
                 mMap.setMyLocationEnabled(true);
-
         }
-
     }
-
 
     @Override
     protected void onStart() {
@@ -497,12 +452,9 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG, "onStart : call mFusedLocationClient.requestLocationUpdates");
             mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
 
-            if (mMap!=null)
+            if (mMap != null)
                 mMap.setMyLocationEnabled(true);
-
         }
-
-
     }
 
 
@@ -512,7 +464,6 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
 
         if (mFusedLocationClient != null) {
-
             Log.d(TAG, "onStop : call stopLocationUpdates");
             mFusedLocationClient.removeLocationUpdates(locationCallback);
         }
@@ -527,7 +478,6 @@ public class MainActivity extends AppCompatActivity
         List<Address> addresses;
 
         try {
-
             addresses = geocoder.getFromLocation(
                     latlng.latitude,
                     latlng.longitude,
@@ -539,7 +489,6 @@ public class MainActivity extends AppCompatActivity
         } catch (IllegalArgumentException illegalArgumentException) {
             Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
             return "잘못된 GPS 좌표";
-
         }
 
 
@@ -551,9 +500,7 @@ public class MainActivity extends AppCompatActivity
             Address address = addresses.get(0);
             return address.getAddressLine(0).toString();
         }
-
     }
-
 
     public boolean checkLocationServicesStatus() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -566,8 +513,7 @@ public class MainActivity extends AppCompatActivity
     public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
 
 
-        if (currentMarker != null) currentMarker.remove();
-
+     //   if (currentMarker != null) currentMarker.remove();
 
         LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -577,25 +523,21 @@ public class MainActivity extends AppCompatActivity
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
 
-
         currentMarker = mMap.addMarker(markerOptions);
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
-        mMap.moveCamera(cameraUpdate);
-
+       // mMap.moveCamera(cameraUpdate);
+        // 카메라가 현재위치로 고정돼있어서 주석처리함
     }
 
-
-    public void setDefaultLocation() {
-
-
+    public void setDefaultLocation(){
         //디폴트 위치, Seoul
         LatLng DEFAULT_LOCATION = new LatLng(37.56, 126.97);
         String markerTitle = "위치정보 가져올 수 없음";
         String markerSnippet = "위치 퍼미션과 GPS 활성 요부 확인하세요";
 
 
-        if (currentMarker != null) currentMarker.remove();
+    //    if (currentMarker != null) currentMarker.remove();
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(DEFAULT_LOCATION);
@@ -607,7 +549,28 @@ public class MainActivity extends AppCompatActivity
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15);
         mMap.moveCamera(cameraUpdate);
+    }
 
+
+    public void setNewLocation() { //검색 위치 지정
+
+
+        String markerTitle = "검색 위치";
+        String markerSnippet = "청량리역";
+
+
+        //if (currentMarker != null) currentMarker.remove();
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(NEW_LOCATION);
+        markerOptions.title(markerTitle);
+        markerOptions.snippet(markerSnippet);
+        markerOptions.draggable(true);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        currentMarker = mMap.addMarker(markerOptions);
+
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(NEW_LOCATION, 15);
+        mMap.moveCamera(cameraUpdate);
     }
 
 
@@ -620,9 +583,8 @@ public class MainActivity extends AppCompatActivity
                 Manifest.permission.ACCESS_COARSE_LOCATION);
 
 
-
         if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
-                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED   ) {
+                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
 
@@ -630,17 +592,14 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+     // ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
 
-
-    /*
-     * ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
-     */
     @Override
     public void onRequestPermissionsResult(int permsRequestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grandResults) {
 
-        if ( permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
+        if (permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
 
             // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
 
@@ -657,12 +616,11 @@ public class MainActivity extends AppCompatActivity
             }
 
 
-            if ( check_result ) {
+            if (check_result) {
 
                 // 퍼미션을 허용했다면 위치 업데이트를 시작합니다.
                 startLocationUpdates();
-            }
-            else {
+            } else {
                 // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다.
 
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
@@ -680,7 +638,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     }).show();
 
-                }else {
+                } else {
 
 
                     // "다시 묻지 않음"을 사용자가 체크하고 거부를 선택한 경우에는 설정(앱 정보)에서 퍼미션을 허용해야 앱을 사용할 수 있습니다.
@@ -725,30 +683,19 @@ public class MainActivity extends AppCompatActivity
         builder.create().show();
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         switch (requestCode) {
-
             case GPS_ENABLE_REQUEST_CODE:
-
-                //사용자가 GPS 활성 시켰는지 검사
-                if (checkLocationServicesStatus()) {
+                if (checkLocationServicesStatus()) { //사용자가 GPS 활성 시켰는지 검사
                     if (checkLocationServicesStatus()) {
-
                         Log.d(TAG, "onActivityResult : GPS 활성화 되있음");
-
-
                         needRequest = true;
-
                         return;
                     }
                 }
-
                 break;
         }
     }
 }
-
